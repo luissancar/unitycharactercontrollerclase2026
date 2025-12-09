@@ -36,6 +36,12 @@ public class PlayerMovement : MonoBehaviour
         ControlMovimiento();
     }
 
+
+    private void OnJump(InputValue value)
+    {
+        if (value.isPressed)
+            jumpRequested = true;
+    }
     private void ControlMovimiento()
     {
         bool isGrounded = characterController.isGrounded;
@@ -53,6 +59,15 @@ public class PlayerMovement : MonoBehaviour
             worldMove.Normalize();
 
         Vector3 horizontalVelocity = worldMove * moveSpeed;
+        //Salto
+        if (isGrounded && jumpRequested)
+        {
+            verticalVelocity=Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumpRequested = false;
+        }
+
+
+        /////////Salto
         verticalVelocity += gravity * Time.deltaTime;
       //  Vector3 velocity = horizontalVelocity;
        // velocity.y = verticalVelocity;
