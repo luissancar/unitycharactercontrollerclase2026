@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,10 +15,17 @@ public class PlayerLook : MonoBehaviour
     private Vector2 lookInput;
     private float cameraPitch;
 
+    [SerializeField] private PlayerInput playerInput;
+    [SerializeField] private float delaySeconds=2f;
+
     private void Awake()
     {
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
+        if (playerInput == null)
+            playerInput = GetComponent<PlayerInput>();
+      //  if (playerInput!=null)
+       //     playerInput.DeactivateInput();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -28,8 +37,15 @@ public class PlayerLook : MonoBehaviour
         lookInput = Vector2.zero;
         if (cameraTransform != null)
             cameraTransform.localRotation = Quaternion.identity;
+        StartCoroutine("StartInput");
     }
 
+    IEnumerator StartInput()
+    {
+       yield return new WaitForSeconds(delaySeconds);
+       if (playerInput != null)
+            playerInput.ActivateInput();
+    }
 
     private void OnLook(InputValue value)
     {
@@ -46,6 +62,14 @@ public class PlayerLook : MonoBehaviour
 
     private void HandleLook()
     {
-        throw new NotImplementedException();
+        float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity *Time.deltaTime;
+
+        transform.Rotate(0f,mouseX,0f);
+
+        cameraPitch -= mouseY;
+        cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
+
+        cameraTransform.localRotation=Quaternion.Euler(cameraPitch,0,0);
     }
 }
