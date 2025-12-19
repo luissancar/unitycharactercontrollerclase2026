@@ -16,6 +16,10 @@ public class PlayerMovement : MonoBehaviour
     private float verticalVelocity;
     private bool jumpRequested = false;
 
+    [SerializeField] private AudioSource audioSourceSalto;
+    [SerializeField] private AudioSource audioSourcePasos;
+    [SerializeField] private int minSpeedSound = 1;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -34,6 +38,23 @@ public class PlayerMovement : MonoBehaviour
         if (characterController == null)
             return;
         ControlMovimiento();
+        SonidoPasos();
+    }
+
+    private void SonidoPasos()
+    {
+        if (audioSourcePasos == null)
+            return;
+        Vector3 v = characterController.velocity;
+        v.y = 0;
+        bool andando = characterController.isGrounded && v.magnitude > minSpeedSound;
+        if (andando)
+        {
+            if (!audioSourcePasos.isPlaying)
+                audioSourcePasos.Play();
+        }
+        else if (audioSourcePasos.isPlaying)
+            audioSourcePasos.Stop();
     }
 
 
@@ -42,6 +63,7 @@ public class PlayerMovement : MonoBehaviour
         if (value.isPressed)
             jumpRequested = true;
     }
+
     private void ControlMovimiento()
     {
         bool isGrounded = characterController.isGrounded;
@@ -62,16 +84,18 @@ public class PlayerMovement : MonoBehaviour
         //Salto
         if (isGrounded && jumpRequested)
         {
-            verticalVelocity=Mathf.Sqrt(jumpHeight * -2f * gravity);
+            if (audioSourceSalto != null)
+                audioSourceSalto.Play();
+            verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
             jumpRequested = false;
         }
 
 
         /////////Salto
         verticalVelocity += gravity * Time.deltaTime;
-      //  Vector3 velocity = horizontalVelocity;
-       // velocity.y = verticalVelocity;
-       horizontalVelocity.y = verticalVelocity;
+        //  Vector3 velocity = horizontalVelocity;
+        // velocity.y = verticalVelocity;
+        horizontalVelocity.y = verticalVelocity;
         characterController.Move(horizontalVelocity * Time.deltaTime);
     }
 }

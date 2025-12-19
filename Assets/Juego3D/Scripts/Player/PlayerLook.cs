@@ -16,7 +16,9 @@ public class PlayerLook : MonoBehaviour
     private float cameraPitch;
 
     [SerializeField] private PlayerInput playerInput;
-    [SerializeField] private float delaySeconds=2f;
+    [SerializeField] private float delaySeconds = 2f;
+
+    private Renderer[] renderers;
 
     private void Awake()
     {
@@ -24,8 +26,13 @@ public class PlayerLook : MonoBehaviour
             cameraTransform = Camera.main.transform;
         if (playerInput == null)
             playerInput = GetComponent<PlayerInput>();
-      //  if (playerInput!=null)
-       //     playerInput.DeactivateInput();
+        renderers = GetComponentsInChildren<Renderer>(true);
+        Ocultar();
+    }
+
+    private void Ocultar()
+    {
+        foreach(var r in renderers) r.enabled = false;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -42,9 +49,15 @@ public class PlayerLook : MonoBehaviour
 
     IEnumerator StartInput()
     {
-       yield return new WaitForSeconds(delaySeconds);
-       if (playerInput != null)
+        yield return new WaitForSeconds(delaySeconds);
+        Mostrar();
+        if (playerInput != null)
             playerInput.ActivateInput();
+    }
+
+    private void Mostrar()
+    {
+        foreach(var r in renderers) r.enabled = true;
     }
 
     private void OnLook(InputValue value)
@@ -63,13 +76,13 @@ public class PlayerLook : MonoBehaviour
     private void HandleLook()
     {
         float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
-        float mouseY = lookInput.y * mouseSensitivity *Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
 
-        transform.Rotate(0f,mouseX,0f);
+        transform.Rotate(0f, mouseX, 0f);
 
         cameraPitch -= mouseY;
         cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
 
-        cameraTransform.localRotation=Quaternion.Euler(cameraPitch,0,0);
+        cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
     }
 }

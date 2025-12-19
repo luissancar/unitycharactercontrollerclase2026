@@ -95,6 +95,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Soltar",
+                    "type": "Button",
+                    "id": "4a12fd9b-ecc7-4eb6-868d-5c49d39bfb1e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -485,23 +494,23 @@
                 },
                 {
                     "name": "",
-                    "id": "5a63b196-be2e-45e9-aec8-8493798e1b42",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ChangeCamera",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "e2bb5071-b539-4150-87b1-44ca78596d7b",
                     "path": "<Keyboard>/c",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "ChangeCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d6c4ba3a-ed01-445a-802e-1c3ea68b2565",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Soltar",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
