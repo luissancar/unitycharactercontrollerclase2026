@@ -1,8 +1,8 @@
-using Unity.VisualScripting;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharacterController))]
+
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movimiento")] public float moveSpeed = 5f;
@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Salto / Gravedad")] public float jumpHeight = 3f;
     public float gravity = -9.81f;
 
-    private CharacterController characterController;
+    [SerializeField] private CharacterController characterController;
 
     [SerializeField] private Vector2 moveInput;
     private float verticalVelocity;
@@ -20,10 +20,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private AudioSource audioSourcePasos;
     [SerializeField] private int minSpeedSound = 1;
 
-
+    [SerializeField] private Animator animator;
+    
+    bool isGrounded;
+    
+    
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
     }
 
@@ -38,7 +44,22 @@ public class PlayerMovement : MonoBehaviour
         if (characterController == null)
             return;
         ControlMovimiento();
+        ControlAnimacion();
         SonidoPasos();
+        
+  
+     
+    }
+
+    private void ControlAnimacion()
+    {
+        
+        Vector3 velocidad = characterController.velocity;
+        Vector3 movimientoLocal = characterController.transform.InverseTransformDirection(velocidad);
+        
+        animator.SetFloat("X", movimientoLocal.x);
+        animator.SetFloat("Y", movimientoLocal.z);
+        animator.SetBool("EnSuelo", characterController.isGrounded);
     }
 
     private void SonidoPasos()
@@ -60,13 +81,23 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnJump(InputValue value)
     {
-        if (value.isPressed)
-            jumpRequested = true;
+      
+        
+       
+        if (value.isPressed) // Comprueba si el botón de salto está presionado.
+            jumpRequested = true; // Marca que se ha solicitado un salto; se usará en el siguiente Update.
+        
     }
 
     private void ControlMovimiento()
     {
-        bool isGrounded = characterController.isGrounded;
+       // bool isGrounded = characterController.isGrounded;
+        
+       
+        
+       
+       
+        
         //Reset vertical al tocar suelo
         if (isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
@@ -91,11 +122,22 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
-        /////////Salto
+        /////////Gravedad
         verticalVelocity += gravity * Time.deltaTime;
-        //  Vector3 velocity = horizontalVelocity;
-        // velocity.y = verticalVelocity;
+          Vector3 velocity = horizontalVelocity;
+         velocity.y = verticalVelocity;
         horizontalVelocity.y = verticalVelocity;
         characterController.Move(horizontalVelocity * Time.deltaTime);
     }
+    
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.normal.y > 0.5f)
+        {
+            Debug.Log("Suelo detectado");
+            isGrounded = true;
+        }
+    }
+    
+    
 }
