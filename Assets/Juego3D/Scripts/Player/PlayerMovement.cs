@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private AudioSource audioSourcePasos;
     [SerializeField] private int minSpeedSound = 1;
 
+    public bool dance;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -39,6 +40,12 @@ public class PlayerMovement : MonoBehaviour
             return;
         ControlMovimiento();
         SonidoPasos();
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            dance = !dance;
+            Debug.LogError("Dance: " + dance);
+        }
+
     }
 
     private void SonidoPasos()

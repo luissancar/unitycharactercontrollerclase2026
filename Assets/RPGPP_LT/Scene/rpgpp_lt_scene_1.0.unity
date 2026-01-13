@@ -7693,6 +7693,7 @@ MonoBehaviour:
   audioSourceSalto: {fileID: 463585474}
   audioSourcePasos: {fileID: 463585474}
   minSpeedSound: 1
+  dance: 0
 --- !u!143 &463585478
 CharacterController:
   m_ObjectHideFlags: 0
@@ -7760,6 +7761,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12571674284ec04fa093837ddaeb067, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerMovement: {fileID: 463585477}
   animator: {fileID: 463585481}
   characterController: {fileID: 463585478}
 --- !u!95 &463585481
@@ -12174,6 +12176,7 @@ MonoBehaviour:
   audioSourceSalto: {fileID: 738121785}
   audioSourcePasos: {fileID: 738121784}
   minSpeedSound: 1
+  dance: 0
 --- !u!114 &738121780
 MonoBehaviour:
   m_ObjectHideFlags: 0

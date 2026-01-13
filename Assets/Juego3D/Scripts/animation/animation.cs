@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class animation : MonoBehaviour
 {
-
+    [SerializeField] private PlayerMovement PlayerMovement;
     [SerializeField] private Animator animator;
     [SerializeField] private CharacterController characterController;
 
@@ -36,6 +36,7 @@ public class animation : MonoBehaviour
         movimientoLocal = transform.InverseTransformDirection(velocidad);
         float x = movimientoLocal.x;
         float y = movimientoLocal.z;
+        float Z = movimientoLocal.y;
 
         if (velocidadMax > 0)
         {
@@ -46,6 +47,8 @@ public class animation : MonoBehaviour
         animator.SetFloat("X", x);
         animator.SetFloat("Y", y);
         animator.SetBool("suelo", characterController.isGrounded);
+        animator.SetBool("dance", PlayerMovement.dance);
+        animator.SetFloat("Z", Z);
 
     }
 
