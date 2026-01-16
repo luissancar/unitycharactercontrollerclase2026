@@ -23,6 +23,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Animator animator;
     
     bool isGrounded;
+
+    private bool saltando = false;
+    private float saltandoAnterior;
+
+    [SerializeField] private HacerseHijoMano hacerseHijoMano;
     
     
     
@@ -31,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
+
     }
 
     private void OnMove(InputValue value)
@@ -46,20 +52,23 @@ public class PlayerMovement : MonoBehaviour
         ControlMovimiento();
         ControlAnimacion();
         SonidoPasos();
-        
-  
-     
     }
 
+
+    private void OnSoltar(InputValue value)
+    {
+        hacerseHijoMano.SoltarPalo();
+    }
     private void ControlAnimacion()
     {
         
         Vector3 velocidad = characterController.velocity;
-        Vector3 movimientoLocal = characterController.transform.InverseTransformDirection(velocidad);
+        Vector3 movimientoLocal = transform.InverseTransformDirection(velocidad);
         
         animator.SetFloat("X", movimientoLocal.x);
         animator.SetFloat("Y", movimientoLocal.z);
-        animator.SetBool("EnSuelo", characterController.isGrounded);
+        animator.SetBool("EnSuelo", isGrounded);
+        animator.SetFloat("Z", verticalVelocity);
     }
 
     private void SonidoPasos()
@@ -81,23 +90,75 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnJump(InputValue value)
     {
-      
-        
-       
         if (value.isPressed) // Comprueba si el botón de salto está presionado.
             jumpRequested = true; // Marca que se ha solicitado un salto; se usará en el siguiente Update.
-        
     }
-
+/// <summary>
     private void ControlMovimiento()
     {
-       // bool isGrounded = characterController.isGrounded;
+        // Movimiento horizontal (local -> world)
+        Vector3 localMove = new Vector3(moveInput.x, 0f, moveInput.y);
+        if (localMove.sqrMagnitude > 1f) localMove.Normalize();
+
+        Vector3 worldMove = transform.TransformDirection(localMove);
+        Vector3 velocity = worldMove * moveSpeed;
+
+        // Si estamos en el suelo (del frame anterior) y cayendo, mantener pegado
+        if (isGrounded && verticalVelocity < 0f)
+            verticalVelocity = -2f;
+
+        // Salto
+        if (isGrounded && jumpRequested)
+        {
+            if (audioSourceSalto != null) audioSourceSalto.Play();
+            animator.SetTrigger("Saltar");
+            saltando = true;
+            //saltandoAnterior = verticalVelocity-2;
+            verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumpRequested = false;
+            isGrounded = false;
+        }
+
+     /*   if (saltando)
+        {
+            if (verticalVelocity < saltandoAnterior)
+            {
+                verticalVelocity = 0;
+                saltando=false;
+            }
+            else
+            {
+                saltandoAnterior = verticalVelocity;
+            }
+        }
         
-       
         
-       
-       
-        
+        Debug.Log($"gravity={gravity}  vY={verticalVelocity}  grounded={isGrounded}");
+*/
+        // Gravedad SIEMPRE (pero con el reset anterior ya no se irá a -50 estando en suelo real)
+        verticalVelocity += gravity * Time.deltaTime;
+
+        // Vector final
+        velocity.y = verticalVelocity;
+
+        // Mover y obtener flags reales de colisión
+        CollisionFlags flags = characterController.Move(velocity * Time.deltaTime);
+
+        // Grounded real del movimiento de este frame
+        isGrounded = (flags & CollisionFlags.Below) != 0;
+
+        // Si acabamos grounded, corta la caída acumulada inmediatamente
+        if (isGrounded && verticalVelocity < 0f)
+            verticalVelocity = -2f;
+    }
+
+
+
+/*
+    private void ControlMovimiento()
+    {
+        isGrounded = characterController.isGrounded;
+
         //Reset vertical al tocar suelo
         if (isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
@@ -117,8 +178,10 @@ public class PlayerMovement : MonoBehaviour
         {
             if (audioSourceSalto != null)
                 audioSourceSalto.Play();
+            animator.SetTrigger("Saltar");
             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
             jumpRequested = false;
+
         }
 
 
@@ -129,13 +192,13 @@ public class PlayerMovement : MonoBehaviour
         horizontalVelocity.y = verticalVelocity;
         characterController.Move(horizontalVelocity * Time.deltaTime);
     }
-    
+    */
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.normal.y > 0.5f)
         {
             Debug.Log("Suelo detectado");
-            isGrounded = true;
+       //     isGrounded = true;
         }
     }
     
